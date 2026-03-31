@@ -1,16 +1,32 @@
 [
   {
-    "product": "OPERA Cloud",
-    "release": "24.1",
-    "status": "On Track",
-    "podUrl": "https://example.com/a",
-    "colorKey": "pink"
+    "product": "Distribution",
+    "release": "26.2.0.0",
+    "date": "15-Apr-2026",
+    "total": 25,
+    "done": 18,
+    "pending": 7,
+    "colorKey": "distribution",
+    "podUrl": "#"
   },
   {
-    "product": "Distribution",
-    "release": "24.1",
-    "status": "At Risk",
-    "podUrl": "https://example.com/b",
-    "colorKey": "blue"
+    "product": "OPERA Cloud",
+    "release": "26.1.0.0",
+    "date": "10-Apr-2026",
+    "total": 30,
+    "done": 20,
+    "pending": 10,
+    "colorKey": "opera",
+    "podUrl": "#"
+  },
+  {
+    "product": "R&A",
+    "release": "26.3.0.0",
+    "date": "20-Apr-2026",
+    "total": 15,
+    "done": 5,
+    "pending": 10,
+    "colorKey": "rna",
+    "podUrl": "#"
   }
 ]
