@@ -1,14 +1,15 @@
 [
   {
-    "product": "Distribution",
+    "channel_name": "hlgiu_oc_distribution_26200_closeout",
     "release": "26.2.0.0",
-    "date": "TBD",
+    "product": "Distribution",
+    "date": "15-Apr-2026",
     "status": "On Track",
-    "total": 230,
-    "done": 220,
-    "pending": 10,
-    "podUrl": "https://jira.oraclecorp.com/jira/issues/?filter=691352",
+    "total": 25,
+    "done": 18,
+    "pending": 7,
+    "ticketsUrl": "https://jira-link-here",
     "colorKey": "distribution",
-    "summary": "Auto from Slack"
+    "summary": "Target release date from Slack canvas."
   }
 ]
