@@ -1,99 +1,566 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Release Dashboard</title>
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --card-border: rgba(15, 23, 42, 0.08);
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 16px 40px rgba(15, 23, 42, 0.14);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial;
-      background: #f5f6fa;
-      padding: 20px;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .search {
+      min-width: 260px;
+      max-width: 360px;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .search:focus {
+      border-color: rgba(99, 102, 241, 0.45);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .count {
+      font-size: 14px;
+      color: var(--muted);
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
     }
 
     .card {
-      padding: 20px;
-      border-radius: 12px;
-      color: #333;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
       cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      min-height: 190px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .product {
+      margin-top: 6px;
+      font-size: 14px;
+      color: rgba(31, 41, 55, 0.78);
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(15, 23, 42, 0.06);
     }
 
     .meta {
       font-size: 14px;
-      margin-bottom: 10px;
+      margin: 8px 0;
+      color: rgba(31, 41, 55, 0.9);
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
     }
 
     .stats {
       display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-weight: bold;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
     }
 
-    .done { color: green; }
-    .pending { color: red; }
+    .stat {
+      flex: 1;
+      min-width: 78px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+    }
 
-    /* pastel colors by product */
+    .stat-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .empty,
+    .loading {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(15, 23, 42, 0.15);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.7);
+    }
+
+    /* Pastel color themes */
     .distribution { background: #e3f2fd; }
     .opera { background: #efebe9; }
     .rna { background: #fdecea; }
+    .purple { background: #f3e8ff; }
+    .green { background: #e8f7ef; }
+    .yellow { background: #fff8db; }
+    .blue { background: #e8f1ff; }
+    .pink { background: #fde8f2; }
+    .mint { background: #e7fbf6; }
+    .peach { background: #fff1e6; }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .modal-header {
+      padding: 22px 22px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .close-btn {
+      border: none;
+      background: rgba(15, 23, 42, 0.06);
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .pod-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pod-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .pod-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pod-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .link-row {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      background: #111827;
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 14px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .pod-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <h1>Release Dashboard</h1>
+        <p>Dynamic release cards with POD details</p>
+      </div>
 
-<h2>Release Dashboard</h2>
+      <input
+        id="search"
+        class="search"
+        type="text"
+        placeholder="Search product or release..."
+      />
+    </div>
 
-<div class="grid">
+    <div class="toolbar">
+      <div class="count" id="count">Loading releases...</div>
+    </div>
 
-  <div class="card distribution">
-    <div class="title">26.2.0.0</div>
-    <div class="meta">Distribution</div>
-    <div class="meta">15-Apr-2026</div>
+    <div id="status" class="loading">Loading dashboard...</div>
+    <div id="cards" class="grid" style="display:none;"></div>
+  </div>
 
-    <div class="stats">
-      <span>Total: 25</span>
-      <span class="done">18</span>
-      <span class="pending">7</span>
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle">Release details</h2>
+          <div id="modalSubtitle" class="subtle"></div>
+        </div>
+        <button class="close-btn" id="closeBtn" aria-label="Close details">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="modalContent"></div>
+
+        <div class="link-row">
+          <a id="podLink" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Open POD</a>
+          <button id="closeBtn2" class="link-btn secondary-btn" type="button">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card opera">
-    <div class="title">26.1.0.0</div>
-    <div class="meta">OPERA Cloud</div>
-    <div class="meta">10-Apr-2026</div>
+  <script>
+    const cardsEl = document.getElementById('cards');
+    const statusEl = document.getElementById('status');
+    const countEl = document.getElementById('count');
+    const searchEl = document.getElementById('search');
 
-    <div class="stats">
-      <span>Total: 30</span>
-      <span class="done">20</span>
-      <span class="pending">10</span>
-    </div>
-  </div>
+    const overlay = document.getElementById('overlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSubtitle = document.getElementById('modalSubtitle');
+    const modalContent = document.getElementById('modalContent');
+    const podLink = document.getElementById('podLink');
+    const closeBtn = document.getElementById('closeBtn');
+    const closeBtn2 = document.getElementById('closeBtn2');
 
-  <div class="card rna">
-    <div class="title">26.3.0.0</div>
-    <div class="meta">R&A</div>
-    <div class="meta">20-Apr-2026</div>
+    let allData = [];
 
-    <div class="stats">
-      <span>Total: 15</span>
-      <span class="done">5</span>
-      <span class="pending">10</span>
-    </div>
-  </div>
+    function esc(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
 
-</div>
+    function getColorClass(item) {
+      if (item.colorKey) return item.colorKey;
+      const product = (item.product || '').toLowerCase();
+      if (product.includes('distribution')) return 'distribution';
+      if (product.includes('opera')) return 'opera';
+      if (product.includes('rna') || product.includes('r&a')) return 'rna';
+      return 'blue';
+    }
 
+    function renderCards(data) {
+      cardsEl.innerHTML = '';
+
+      if (!data.length) {
+        cardsEl.style.display = 'none';
+        statusEl.style.display = 'block';
+        statusEl.className = 'empty';
+        statusEl.textContent = 'No releases found.';
+        countEl.textContent = '0 releases';
+        return;
+      }
+
+      statusEl.style.display = 'none';
+      cardsEl.style.display = 'grid';
+      countEl.textContent = `${data.length} release${data.length === 1 ? '' : 's'}`;
+
+      data.forEach(item => {
+        const colorClass = getColorClass(item);
+
+        const card = document.createElement('div');
+        card.className = `card ${colorClass}`;
+        card.tabIndex = 0;
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div>
+              <div class="title">${esc(item.release || '')}</div>
+              <div class="product">${esc(item.product || '')}</div>
+            </div>
+            <div class="badge">${esc(item.status || 'Open')}</div>
+          </div>
+
+          <div class="meta"><strong>Target date:</strong> ${esc(item.date || 'TBD')}</div>
+          <div class="subtle">${esc(item.summary || 'Click to view detailed POD information.')}</div>
+
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-label">Total</span>
+              <span class="stat-value">${esc(item.total ?? '-')}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Done</span>
+              <span class="stat-value">${esc(item.done ?? '-')}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Pending</span>
+              <span class="stat-value">${esc(item.pending ?? '-')}</span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openModal(item));
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openModal(item);
+          }
+        });
+
+        cardsEl.appendChild(card);
+      });
+    }
+
+    function openModal(item) {
+      modalTitle.textContent = `${item.release || 'Release details'}`;
+      modalSubtitle.textContent = item.product || '';
+
+      const items = [
+        ['Product', item.product],
+        ['Release', item.release],
+        ['Status', item.status],
+        ['Target date', item.date],
+        ['Total', item.total],
+        ['Done', item.done],
+        ['Pending', item.pending],
+        ['Owner', item.owner],
+        ['Risk', item.risk],
+        ['Notes', item.notes]
+      ];
+
+      modalContent.innerHTML = `
+        <div class="pod-grid">
+          ${items
+            .filter(([label, value]) => value !== undefined && value !== null && String(value).trim() !== '')
+            .map(([label, value]) => `
+              <div class="pod-box">
+                <div class="pod-label">${esc(label)}</div>
+                <div class="pod-value">${esc(value)}</div>
+              </div>
+            `)
+            .join('')}
+        </div>
+      `;
+
+      const podUrl = item.podUrl && item.podUrl !== '#' ? item.podUrl : null;
+      podLink.href = podUrl || '#';
+      podLink.style.pointerEvents = podUrl ? 'auto' : 'none';
+      podLink.style.opacity = podUrl ? '1' : '0.5';
+      podLink.textContent = podUrl ? 'Open POD' : 'No POD link yet';
+
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    closeBtn2.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    searchEl.addEventListener('input', () => {
+      const q = searchEl.value.trim().toLowerCase();
+      const filtered = allData.filter(item => {
+        const text = `${item.product || ''} ${item.release || ''} ${item.status || ''} ${item.date || ''}`.toLowerCase();
+        return text.includes(q);
+      });
+      renderCards(filtered);
+    });
+
+    fetch('data.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Could not load data.json');
+        }
+        return response.json();
+      })
+      .then(data => {
+        allData = Array.isArray(data) ? data : [];
+        renderCards(allData);
+      })
+      .catch(error => {
+        console.error(error);
+        statusEl.style.display = 'block';
+        statusEl.className = 'empty';
+        statusEl.textContent = 'Could not load data.json. Make sure the file exists and is published with GitHub Pages.';
+        countEl.textContent = '0 releases';
+      });
+  </script>
 </body>
 </html>
