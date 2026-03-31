@@ -3,30 +3,45 @@
     "product": "Distribution",
     "release": "26.2.0.0",
     "date": "15-Apr-2026",
+    "status": "On Track",
     "total": 25,
     "done": 18,
     "pending": 7,
+    "owner": "Alice",
+    "risk": "Low",
+    "notes": "All major items are complete.",
+    "podUrl": "https://example.com/distribution",
     "colorKey": "distribution",
-    "podUrl": "#"
+    "summary": "Release is progressing normally."
   },
   {
     "product": "OPERA Cloud",
     "release": "26.1.0.0",
     "date": "10-Apr-2026",
+    "status": "At Risk",
     "total": 30,
     "done": 20,
     "pending": 10,
+    "owner": "Bob",
+    "risk": "Medium",
+    "notes": "A few items are still waiting on sign-off.",
+    "podUrl": "https://example.com/opera",
     "colorKey": "opera",
-    "podUrl": "#"
+    "summary": "Needs attention before release."
   },
   {
     "product": "R&A",
     "release": "26.3.0.0",
     "date": "20-Apr-2026",
+    "status": "Blocked",
     "total": 15,
     "done": 5,
     "pending": 10,
+    "owner": "Carol",
+    "risk": "High",
+    "notes": "Blocked by upstream dependency.",
+    "podUrl": "https://example.com/rna",
     "colorKey": "rna",
-    "podUrl": "#"
+    "summary": "Waiting on another team."
   }
 ]
