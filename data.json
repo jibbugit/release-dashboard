@@ -5,11 +5,16 @@
     "product": "Distribution",
     "date": "15-Apr-2026",
     "status": "On Track",
-    "total": 25,
-    "done": 18,
-    "pending": 7,
-    "ticketsUrl": "https://jira-link-here",
+    "total": 40,
+    "done": 22,
+    "pending": 18,
+    "jiraUrl": "https://your-jira-link-here",
     "colorKey": "distribution",
-    "summary": "Target release date from Slack canvas."
+    "summary": "Target release date from Slack canvas.",
+    "podBreakdown": [
+      { "pod": "ARI", "done": 10, "pending": 12 },
+      { "pod": "CFO", "done": 12, "pending": 13 },
+      { "pod": "RESQ", "done": 15, "pending": 18 }
+    ]
   }
 ]
