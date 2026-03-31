@@ -1,0 +1,129 @@
+name: Update Jira Counts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Update data.json from Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import re
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          BASE_URL = "https://jira.oraclecorp.com/jira"
+          DATA_FILE = Path("data.json")
+          DEFAULT_PODS = ["ARI", "CFO", "RESQ"]
+          STATUS_EXCLUDE = '("(87) Ready For Release",Done,Closed,"Final Review","92 - Closed, Not a Bug","96 - Closed, Duplicate Bug","91 - Closed, Could Not Reproduce")'
+
+          email = os.environ["JIRA_EMAIL"]
+          token = os.environ["JIRA_TOKEN"]
+
+          auth = base64.b64encode(f"{email}:{token}".encode()).decode()
+          headers = {
+              "Authorization": f"Basic {auth}",
+              "Accept": "application/json",
+          }
+
+          def get_json(url: str):
+              req = urllib.request.Request(url, headers=headers, method="GET")
+              with urllib.request.urlopen(req) as resp:
+                  return json.loads(resp.read().decode("utf-8"))
+
+          def search_count(jql: str) -> int:
+              params = urllib.parse.urlencode({
+                  "jql": jql,
+                  "maxResults": 1,
+                  "fields": "none"
+              })
+              url = f"{BASE_URL}/rest/api/3/search?{params}"
+              data = get_json(url)
+              return int(data.get("total", 0))
+
+          def get_filter_jql(filter_id: str) -> str:
+              data = get_json(f"{BASE_URL}/rest/api/3/filter/{filter_id}")
+              jql = data.get("jql")
+              if not jql:
+                  raise RuntimeError(f"No JQL returned for filter {filter_id}")
+              return jql
+
+          items = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+          changed = False
+
+          for item in items:
+              jira_url = item.get("jiraUrl", "")
+              m = re.search(r"[?&]filter=(\d+)", jira_url)
+              if not m:
+                  continue
+
+              filter_id = m.group(1)
+              base_jql = get_filter_jql(filter_id)
+
+              total = search_count(base_jql)
+              pending_jql = f"{base_jql} AND status not in {STATUS_EXCLUDE}"
+              pending = search_count(pending_jql)
+              done = max(total - pending, 0)
+
+              pods_source = item.get("podBreakdown") or DEFAULT_PODS
+              pod_breakdown = []
+
+              for pod in pods_source:
+                  pod_name = pod if isinstance(pod, str) else pod.get("pod")
+                  if not pod_name:
+                      continue
+
+                  pod_total = search_count(f'{base_jql} AND POD = "{pod_name}"')
+                  pod_pending = search_count(
+                      f'{base_jql} AND POD = "{pod_name}" AND status not in {STATUS_EXCLUDE}'
+                  )
+                  pod_done = max(pod_total - pod_pending, 0)
+
+                  pod_breakdown.append({
+                      "pod": pod_name,
+                      "total": pod_total,
+                      "done": pod_done,
+                      "pending": pod_pending
+                  })
+
+              item["total"] = total
+              item["done"] = done
+              item["pending"] = pending
+              item["podBreakdown"] = pod_breakdown
+              changed = True
+
+          if changed:
+              DATA_FILE.write_text(json.dumps(items, indent=2) + "\n", encoding="utf-8")
+              print("data.json updated")
+          else:
+              print("No Jira filter IDs found in data.json")
+          PY
+
+      - name: Commit updated data.json
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "Update Jira counts"
+          git push
