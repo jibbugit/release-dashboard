@@ -1,0 +1,16 @@
+[
+  {
+    "product": "OPERA Cloud",
+    "release": "24.1",
+    "status": "On Track",
+    "podUrl": "https://example.com/a",
+    "colorKey": "pink"
+  },
+  {
+    "product": "Distribution",
+    "release": "24.1",
+    "status": "At Risk",
+    "podUrl": "https://example.com/b",
+    "colorKey": "blue"
+  }
+]
