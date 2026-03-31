@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Release Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f6fa;
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 12px;
+      color: #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .done { color: green; }
+    .pending { color: red; }
+
+    /* pastel colors by product */
+    .distribution { background: #e3f2fd; }
+    .opera { background: #efebe9; }
+    .rna { background: #fdecea; }
+  </style>
+</head>
+
+<body>
+
+<h2>Release Dashboard</h2>
+
+<div class="grid">
+
+  <div class="card distribution">
+    <div class="title">26.2.0.0</div>
+    <div class="meta">Distribution</div>
+    <div class="meta">15-Apr-2026</div>
+
+    <div class="stats">
+      <span>Total: 25</span>
+      <span class="done">18</span>
+      <span class="pending">7</span>
+    </div>
+  </div>
+
+  <div class="card opera">
+    <div class="title">26.1.0.0</div>
+    <div class="meta">OPERA Cloud</div>
+    <div class="meta">10-Apr-2026</div>
+
+    <div class="stats">
+      <span>Total: 30</span>
+      <span class="done">20</span>
+      <span class="pending">10</span>
+    </div>
+  </div>
+
+  <div class="card rna">
+    <div class="title">26.3.0.0</div>
+    <div class="meta">R&A</div>
+    <div class="meta">20-Apr-2026</div>
+
+    <div class="stats">
+      <span>Total: 15</span>
+      <span class="done">5</span>
+      <span class="pending">10</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
